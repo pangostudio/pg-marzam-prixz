@@ -85,55 +85,21 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
         
            // Webservice
            foreach( $cart_data["products"] as $product ){
-               //$client = new SoapClient( $wc_url ,  array('setTransactionInit'));
-               /*$args = array(
+               //Primer método (transactionInit)
+               $client = new SoapClient( $wc_url );
+               $args = array(
                        "cardnumber" => $cart_data["card_id"],
                        "storeid" 	=> '10',
                        "posid"		=> '1',
-                       "employeeid"	=> '1',
+                       "employeeid"	=> '100',
                        "key"	=> $key,
-               );*/
-               //llamada al primer método
-               /*$curl = curl_init();
-                curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://orbisws00.orbisfarma.com.mx/Transaccion.asmx/setTransactionInit',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => 'cardnumber=3601001084425%20&storeid=10&posid=1&employeeid=100&key=7CC7DDAA1760675BC84D010390627FA8',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/x-www-form-urlencoded'
-                ),
-                ));
-                */
-
-                $client = new SoapClient( $wc_url );
-                $args = array(
-                   // "setTransactionInit" => array(
-                        "cardnumber" => '3601001084425',
-                        "storeid" 	=> '10',
-                        "posid"		=> '1',
-                        "employeeid"	=> '1',
-                        "key"	=> '7CC7DDAA1760675BC84D010390627FA8',
-            
-                    //),
-                );
+               );
+               
                 //try primer método
                try {
                    $result = $client->setTransactionInit( $args );
                    var_dump($result);
-                  /* $response = curl_exec($curl);
-                    curl_close($curl);
-
-                    //Se convierte el string que se nos devuelve a un array
-                    $array = json_decode(json_encode((array)simplexml_load_string($response)),true);
-                    var_dump($array);
-                    //  echo $response;
-                 */
+                  
                    //Sacar variables de response que usaremos en la siguiente llamada
                    /*
         
@@ -141,29 +107,22 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
                    $transactionitems =  ;
                   
                    */
-                   //Llamada al segundo método
-                   $curl2 = curl_init();
+                   //Llamada al segundo método (transactionQuote)
+                        $client = new SoapClient( $wc_url );
+                            $args = array(
+                            "cardnumber" => $cart_data["card_id"],
+                            "storeid" 	=> '10',
+                            "posid"		=> '1',
+                            "employeeid"	=> '100',
+                            "transactionid" => '',
+                            "transactionitems" => '',
+                            "key"	=> $key,
 
-                   curl_setopt_array($curl2, array(
-                     CURLOPT_URL => 'https://orbisws00.orbisfarma.com.mx/Transaccion.asmx/setTransactionQuote?cardnumber=3601001084425&storeid=10&posid=1&employeeid=100&key=7CC7DDAA1760675BC84D010390627FA8',
-                     CURLOPT_RETURNTRANSFER => true,
-                     CURLOPT_ENCODING => '',
-                     CURLOPT_MAXREDIRS => 10,
-                     CURLOPT_TIMEOUT => 0,
-                     CURLOPT_FOLLOWLOCATION => true,
-                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                     CURLOPT_CUSTOMREQUEST => 'POST',
-                     CURLOPT_POSTFIELDS => 'cardnumber=3601001084425%20&storeid=10&posid=1&employeeid=100&key=7CC7DDAA1760675BC84D010390627FA8&transactionid=13829131856354&transactionitems=4005900436962%2C3%2C2%2C6',
-                     CURLOPT_HTTPHEADER => array(
-                       'Content-Type: application/x-www-form-urlencoded'
-                     ),
-                   ));
+                    );
                   
                    // try segundo método
                    try{
-                    $response = curl_exec($curl2);
-                    
-                    curl_close($curl2);
+                    $result = $client->setTransactionQuote( $args );
                     
                     //Sacar las variables del segundo método
                    // $transactionitemsDiscount =  ;
@@ -174,27 +133,23 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
                    // $invoiceamount = ;
 
                         //Llamada al tercer método
-                        $curl3 = curl_init();
-
-                        curl_setopt_array($curl3, array(
-                        CURLOPT_URL => 'https://orbisws00.orbisfarma.com.mx/Transaccion.asmx/setTransactionSale?cardnumber=3601001084425&storeid=10&posid=1&employeeid=100&key=7CC7DDAA1760675BC84D010390627FA8',
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => '',
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 0,
-                        CURLOPT_FOLLOWLOCATION => true,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => 'POST',
-                        CURLOPT_POSTFIELDS => 'cardnumber=3601001084425%20&storeid=10&posid=1&employeeid=100&key=7CC7DDAA1760675BC84D010390627FA8&transactionid=13829131856354&transactionitems=4005900436962%2C3%2C2%2C6&transactionwithdrawal=0&invoicenumber=1&invoicedate=20210812&invoiceamount=1',
-                        CURLOPT_HTTPHEADER => array(
-                            'Content-Type: application/x-www-form-urlencoded'
-                        ),
-                        ));
+                        $client = new SoapClient( $wc_url );
+                        $args = array(
+                        "cardnumber" => $cart_data["card_id"],
+                        "storeid" 	=> '10',
+                        "posid"		=> '1',
+                        "employeeid"	=> '100',
+                        "transactionid" => '',
+                        "transactionitems" => '',
+                        "transactionwithdrawal" => '0',
+                        "invoicenumber" => '1',
+                        "invoicedate" => '', //la fecha va junta (20210812)
+                        "invoiceamount" => '1',
+                        "key"	=> $key,
+                         );
                             //try tercer método
                             try{
-                                $response3 = curl_exec($curl3);
-                                
-                                curl_close($curl3);
+                                $result = $client->setTransactionSale( $args );                                
                             }
                             
                             //cerrar venta
