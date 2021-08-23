@@ -21,8 +21,8 @@ global $product;
 				<table class="form-table">
 					<tbody>
 						<tr>
-							<th><label for="orbis_prixz_url_procesarcompra">'.__( 'TransactionInit', 'orbis-prixz' ).'</label></th>
-							<td><input class="regular-text" type="url" id="orbis_prixz_url_procesarcompra" name="orbis_prixz_url_procesarcompra" value="'.get_option('orbis_prixz_url_procesarcompra').'"></td>
+							<th><label for="orbis_prixz_url_webservice">'.__( 'Webservice', 'orbis-prixz' ).'</label></th>
+							<td><input class="regular-text" type="url" id="orbis_prixz_url_webservice" name="orbis_prixz_url_webservice" value="'.get_option('orbis_prixz_url_webservice').'"></td>
 						</tr>
 						<tr>
 							<th><label for="orbis_prixz_url_cerrarcompra">'.__( 'TransactionQuote', 'orbis-prixz' ).'</label></th>
@@ -46,7 +46,7 @@ global $product;
 	add_action( 'admin_menu', 'orbis_prixz_settings_page', 10 );
 
 	function orbis_prixz_options_registration(){
-		register_setting('orbis-prixz-settings-group', 'orbis_prixz_url_procesarcompra');
+		register_setting('orbis-prixz-settings-group', 'orbis_prixz_url_webservice');
 		register_setting('orbis-prixz-settings-group', 'orbis_prixz_url_cerrarcompra');
 		register_setting('orbis-prixz-settings-group', 'orbis_prixz_marzam_products');
 	}
