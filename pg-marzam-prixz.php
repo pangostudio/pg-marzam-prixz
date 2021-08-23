@@ -213,7 +213,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
                    echo 'no funciona';
                }
 
-                        //$transactionitemsDiscount;
+                        //Se setean los tipos de ofertas
                        
                         $transactionimtesDiscount_array = explode('|',$transactionitemsDiscount);
 
