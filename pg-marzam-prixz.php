@@ -39,7 +39,6 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
                 "user_id"		=> $user_id,
                 "products" => array(),
                 "carditems"	=> array(),
-                "benefits"	=> array(),
                 "cardnumber" => 3601001084425,
                 "storeid" 	=> '10',
                 "posid"		=> '1',
@@ -65,6 +64,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
             if ( $variation_id ) $_product = wc_get_product( $variation_id );
             else $_product = wc_get_product( $product_id);
             $ean = wpm_get_code_gtin_by_product($product_id);
+            var_dump($ean);
             //Coge el atributo
             $isMarzam = $_product->get_attribute('pa_marzam');
             if ($isMarzam == 'marzam'){
@@ -86,7 +86,6 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
     }
     
        // Get benefits
-       $cart_data["benefits"] = array();
        $cart_data["card_id"] = '3601001084425';
        $key = '7CC7DDAA1760675BC84D010390627FA8';
        //seteamos array para las respuestas del webservice
@@ -235,9 +234,9 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
                         }
                         else {
                         $array_respuesta[$transactionitem[0]]['type'] = 0;
-                        $array_respuesta[$transactionitem[0]]['message'] = null;
+                        $array_respuesta[$transactionitem[0]]['message'] = "No se encontró descuento para este artículo";
                         }
-            
+                        //var_dump($array_respuesta);
                         }
 
                        // var_dump($array_respuesta);     
@@ -288,36 +287,30 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ){
                else $_product = wc_get_product( $product_id);
                //$sku = $values['data']->get_sku();
                $sku = wpm_get_code_gtin_by_product($product_id);
-               $benefit = isset( $cart_data["benefits"][$sku] ) ? $cart_data["benefits"][$sku] : array();
                //var_dump($benefit);
-               $benefit_type = isset( $benefit["type"] ) ? $benefit["type"] : '';
+               $benefit_type = isset( $array_respuesta[$ean]["type"] ) ? $array_respuesta[$ean]["type"] : '';
                switch( $benefit_type  ){
-                   case "free_pieces":
-                       if ( !isset( $values["marzam-benefit-gift"] ) && $benefit["suggestion"] ){
-                           $item_name = $_product->get_name()/*.'<br><span class="suggestion">'.sprintf( __( 'Añade %s más para conseguir otro gratis','orbis-prixz' ), $benefit["suggestion"] ).'</span>'*/;
-                           $values["data"]->set_name( $item_name );
-                       }
-                       if ( isset( $values["marzam-benefit-gift"] ) ){
-                           $item_name = $_product->get_name().' ('.__( 'Producto gratis','orbis-prixz' ).')'.'<br><span class="message">'.$benefit["message"].'</span>';
+                   case "2":
+                           $item_name = $_product->get_name().' ('.__( 'Producto gratis','orbis-prixz' ).')'.'<br><span class="message">'.$array_respuesta[$ean]["message"].'</span>';
                            $values["data"]->set_name( $item_name );
                            $values["data"]->set_price( 0 );
-                       }
                        break;
-                   case "discount":
-                       if ( $benefit["suggestion"] ){
-                           $item_name = $_product->get_name().'<br><span class="suggestion">'.sprintf( __( 'Añade %s más para conseguir un descuento','orbis-prixz' ), $benefit["suggestion"] ).'</span>';
+                   case "1":
+                           $item_name = $_product->get_name().'<br><span class="message">'.$array_respuesta[$ean]["message"].'</span>';
                            $values["data"]->set_name( $item_name );
-                           var_dump($benefit);
-                       }
-                       if ( $benefit["message"] ){
-                           $item_name = $_product->get_name().'<br><span class="message">'.$benefit["message"].'</span>';
-                           $values["data"]->set_name( $item_name );
-                       }
+                           $discount_value = $_product->get_price() * $array_respuesta[$ean]["discount"] / 100;
+                           $newPrice = $_product-> get_price() - $discount_value;
+                           $values["data"]->set_price( $newPrice );
+                           var_dump($newPrice);
+                           var_dump($_product->get_price());
+                           var_dump($array_respuesta[$ean]["discount"]);
                        break;
                }
            }
        }
        set_transient( $transient, $cart_data );
+       //var_dump('----------------------------------');
+       //var_dump($cart_data);
 }
 add_action('woocommerce_before_calculate_totals', 'orbis_prixz_woocommerce_before_calculate_totals', 10, 1);
 
