@@ -96,9 +96,11 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                     foreach ($result[0] as $title) {
                         
                     }
-		   foreach($eanarray as $ean) {
+		   foreach($eanarray as $ean_aux) {
 			   //tenemos el ean de cada producto
-               $items = $ean . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
+			   var_dump($ean_aux);
+               $items = $ean_aux . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
+			   var_dump($items);
 		   }
                //Sacar variables de response que usaremos en la siguiente llamada
               $transactionid = $title->transactionid;
