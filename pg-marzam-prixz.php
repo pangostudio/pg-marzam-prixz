@@ -33,6 +33,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
     // Find products
     $cart_data["products"] = array();
     $eanarray = [];
+	$arrayWS =[];
     foreach( $cart->get_cart() as $item => $values ) {   
         //var_dump($values) ;
         if ( !isset( $values["marzam-benefit-gift"]) ){
@@ -46,7 +47,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             /*foreach($segmentedEan as $segmentedEanInterior) {
             }*/
             $eanarray[] = $ean;
-
+		$arrayWS[] =  $items = $ean_aux . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
             //Coge el atributo
             $isMarzam = $_product->get_attribute('pa_marzam');
             if ($isMarzam == 'marzam'){
@@ -64,7 +65,9 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
         }
     }
     //var_dump($eanarray);
-
+	var_dump('arrayWS',$arrayWS);
+	$stringWS = implode('|',$arrayWS);
+	var_dump($stringWS);
        // Get benefits
 		$cart_data["benefits"] = array();
 
