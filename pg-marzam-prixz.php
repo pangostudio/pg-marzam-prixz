@@ -41,10 +41,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             if ( $variation_id ) $_product = wc_get_product( $variation_id );
             else $_product = wc_get_product( $product_id);
             $ean = wpm_get_code_gtin_by_product($product_id);
-            $segmentedEan = explode(" ", $ean);
-            
-            foreach($segmentedEan as $segmentedEanInterior) {
-            }
+
             $eanarray[] = $segmentedEanInterior;
 
             //Coge el atributo
@@ -63,7 +60,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             }
         }
     }
-    var_dump($eanarray);
+    //var_dump($eanarray);
 
        // Get benefits
 		$cart_data["benefits"] = array();
