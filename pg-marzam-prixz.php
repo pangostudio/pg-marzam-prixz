@@ -43,12 +43,20 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             else $_product = wc_get_product( $product_id);
             $ean = wpm_get_code_gtin_by_product($product_id);
             //$segmentedEan = explode(" ", $ean);
-            
-            /*foreach($segmentedEan as $segmentedEanInterior) {
-            }*/
-            $eanarray[] = $ean;
-		$arrayWS[] =  $items = $ean_aux . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
-            //Coge el atributo
+            //var_dump($product_id);
+            var_dump("-------------------");
+            //var_dump($ean);
+            var_dump("-------------------");
+            var_dump("-------------------");
+           $array_items[] = $items = $ean . ',' . $values['quantity'] .','. $_product->get_price($product_id) . ',' . ($values['quantity'] * $_product->get_price($product_id));
+
+            if (is_array($array_items))
+                foreach($array_items as $productos)
+                {
+                    
+                }
+                var_dump($productos);            
+                //Coge el atributo
             $isMarzam = $_product->get_attribute('pa_marzam');
             if ($isMarzam == 'marzam'){
                 // hide coupon field on cart page
@@ -64,10 +72,6 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             }
         }
     }
-    //var_dump($eanarray);
-	var_dump('arrayWS',$arrayWS);
-	$stringWS = implode('|',$arrayWS);
-	var_dump($stringWS);
        // Get benefits
 		$cart_data["benefits"] = array();
 
@@ -95,16 +99,15 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                     $sxe = new SimpleXMLElement($parse_xml);
                     $sxe->registerXPathNamespace('d', 'urn:schemas-microsoft-com:xml-diffgram-v1');
                     $result = $sxe->xpath("//NewDataSet");
-
+                    echo "<pre>";
                     foreach ($result[0] as $title) {
-                        
+                        print_r($title);
                     }
-		   foreach($eanarray as $ean_aux) {
+                    echo "</pre>";
+		   
 			   //tenemos el ean de cada producto
-			   var_dump($ean_aux);
-               $items = $ean_aux . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
-			   var_dump($items);
-		   }
+              
+               
                //Sacar variables de response que usaremos en la siguiente llamada
               $transactionid = $title->transactionid;
              
@@ -115,11 +118,8 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
            catch (Exception $e) {
                echo 'no funciona';
            }
-	       $auxArray = 0;
-           foreach( $cart_data["products"] as $product ){
-               //var_dump($product);
-                //$items = $id . ',' . $product["quantity"] .','. $product["price"] . ',' . ($product["quantity"] * $product["price"] );
-            
+
+           foreach( $cart_data["products"] as $product ){            
                         //Llamada al segundo método (transactionQuote)
                         $client = new SoapClient( $wc_url );
                             $args = array(
@@ -128,11 +128,11 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                             "posid"		=> '1',
                             "employeeid"	=> '100',
                             "transactionid" => $transactionid,
-                            //"transactionitems" => $items,
-			"transactionitems" => $arrayWS[$auxArray],
+                            "transactionitems" => $productos,
+			//"transactionitems" => $arrayWS[$auxArray],
                             "key"	=> $key,
                     );
-		   $auxArray++;
+		  // $auxArray++;
                    
                     // try segundo método
                    try{
@@ -142,15 +142,14 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                    $sxe = new SimpleXMLElement($parse_xml);
                    $sxe->registerXPathNamespace('d', 'urn:schemas-microsoft-com:xml-diffgram-v1');
                    $result = $sxe->xpath("//NewDataSet");
-
+                   echo "<pre>";
                    foreach ($result[0] as $title) {
-                       
+                    print_r($title);
                    }
-
+                   echo "</pre>";
 
                         //Sacar las variables del segundo método
                         $transactionitemsDiscount = $title->transactionitems;
-                        //var_dump($result[0]);  
                         $cart_data['transactionitemsDiscount'] = (array)$transactionitemsDiscount;
                         $transactiondate = $title->transactiondate; 
                         $transactionwithdrawal = 0; 
