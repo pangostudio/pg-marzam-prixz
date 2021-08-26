@@ -53,7 +53,7 @@
 			
 			// Card id form
 			if ( !$cart_data["card_id"] && count( $cart_data["products"] ) > 0 ) {
-				echo '<label>Agrega el folio de tu tarjeta de lealtad <a style="text-decoration: none;"  href="#" data-toggle="tooltip" data-placement="top" title="Consulta a tu médico para saber más sobre el Programa de Lealtad"><i class="fa fa-info-circle" aria-hidden="true"></i></a></label>
+				echo '<label>Agrega tu tarjeta de lealtad <a style="text-decoration: none;"  href="#" data-toggle="tooltip" data-placement="top" title="Consulta a tu médico para saber más sobre el Programa de Lealtad"><i class="fa fa-info-circle" aria-hidden="true"></i></a></label>
 				<form name="card_id_form" method="post" action="'.$actual_url.'">
 					<input type="text" id="card_id" name="card_id" placeholder="'.__('Número de tarjeta','orbis-prixz').'" required>
 					<input type="submit" value="'.__('Comprobar','orbis-prixz').'">
@@ -76,14 +76,16 @@
 				}
 			}
 			foreach ( $cart_data["benefits"] as $benefit ){
-				if ( $benefit["type"] == 'free-products' && isset( $benefit["amount"] ) && $benefit["amount"] > 0 ){
-					$cart->add_to_cart(
-						$benefit["product_id"],
-						$benefit["amount"],
-						$benefit["variation_id"],
-						array(),
-						array ( 'marzam-benefit-gift' => true )
-					);
+				foreach( $benefit as $information){
+					if ( $information["type"] == 2 && isset( $information["quantity"] ) && $information["quantity"] > 0 ){
+						$cart->add_to_cart(
+							$information["product_id"],
+							$information["quantity"],
+							$information["variation_id"],
+							array(),
+							array ( 'marzam-benefit-gift' => true )
+						);
+					}
 				}
 			}
 		}

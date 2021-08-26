@@ -17,25 +17,12 @@ global $product;
 			echo '<form method="post" action="options.php">';
 				settings_fields( 'orbis-prixz-settings-group' );
 				do_settings_sections( 'orbis-prixz-settings-group' ); 
-				echo '<h2>'.__('Webservice', 'orbis-prixz').'</h2>
+				echo '<h2>'.__('', 'orbis-prixz').'</h2>
 				<table class="form-table">
 					<tbody>
 						<tr>
 							<th><label for="orbis_prixz_url_webservice">'.__( 'Webservice', 'orbis-prixz' ).'</label></th>
 							<td><input class="regular-text" type="url" id="orbis_prixz_url_webservice" name="orbis_prixz_url_webservice" value="'.get_option('orbis_prixz_url_webservice').'"></td>
-						</tr>
-						<tr>
-							<th><label for="orbis_prixz_url_cerrarcompra">'.__( 'TransactionQuote', 'orbis-prixz' ).'</label></th>
-							<td><input class="regular-text" type="url" id="orbis_prixz_url_cerrarcompra" name="orbis_prixz_url_cerrarcompra" value="'.get_option('orbis_prixz_url_cerrarcompra').'"></td>
-						</tr>
-						<tr>
-							<th><label for="orbis_prixz_url_cerrarcompra">'.__( 'TransactionSale', 'orbis-prixz' ).'</label></th>
-							<td><input class="regular-text" type="url" id="orbis_prixz_url_cerrarcompra" name="orbis_prixz_url_cerrarcompra" value="'.get_option('orbis_prixz_url_cerrarcompra').'"></td>
-						</tr>
-						<tr>
-							<th><label for="orbis_prixz_marzam_products">'.__( 'Procesar Compra', 'orbis-prixz' ).'</label></th>
-							<input type="text" value="marzam">
-							
 						</tr>
 					</tbody>
 				</table>';
@@ -47,8 +34,6 @@ global $product;
 
 	function orbis_prixz_options_registration(){
 		register_setting('orbis-prixz-settings-group', 'orbis_prixz_url_webservice');
-		register_setting('orbis-prixz-settings-group', 'orbis_prixz_url_cerrarcompra');
-		register_setting('orbis-prixz-settings-group', 'orbis_prixz_marzam_products');
 	}
 
 ?>
