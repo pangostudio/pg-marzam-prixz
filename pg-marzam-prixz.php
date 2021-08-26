@@ -127,7 +127,8 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                             "posid"		=> '1',
                             "employeeid"	=> '100',
                             "transactionid" => $transactionid,
-                            "transactionitems" => $items,
+                            //"transactionitems" => $items,
+			"transactionitems" => $stringWS,
                             "key"	=> $key,
                     );
                    
