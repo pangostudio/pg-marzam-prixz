@@ -41,8 +41,11 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             if ( $variation_id ) $_product = wc_get_product( $variation_id );
             else $_product = wc_get_product( $product_id);
             $ean = wpm_get_code_gtin_by_product($product_id);
-
-            $eanarray[] = $segmentedEanInterior;
+            //$segmentedEan = explode(" ", $ean);
+            
+            /*foreach($segmentedEan as $segmentedEanInterior) {
+            }*/
+            $eanarray[] = $ean;
 
             //Coge el atributo
             $isMarzam = $_product->get_attribute('pa_marzam');
@@ -93,9 +96,13 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                     foreach ($result[0] as $title) {
                         
                     }
+		   foreach($eanarray as $ean) {
+			   //tenemos el ean de cada producto
+               $items = $ean . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
+		   }
                //Sacar variables de response que usaremos en la siguiente llamada
               $transactionid = $title->transactionid;
-              $items = $segmentedEanInterior . ',' . $values['quantity'] .','. $_product->get_price() . ',' . ($values['quantity'] * $_product->get_price());
+             
               $cart_data['transactionid'] = (array)$transactionid;
               //var_dump($items);
            }
