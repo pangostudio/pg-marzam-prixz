@@ -115,6 +115,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
            catch (Exception $e) {
                echo 'no funciona';
            }
+	       $auxArray = 0;
            foreach( $cart_data["products"] as $product ){
                //var_dump($product);
                 //$items = $id . ',' . $product["quantity"] .','. $product["price"] . ',' . ($product["quantity"] * $product["price"] );
@@ -128,9 +129,10 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                             "employeeid"	=> '100',
                             "transactionid" => $transactionid,
                             //"transactionitems" => $items,
-			"transactionitems" => $stringWS,
+			"transactionitems" => $arrayWS[$auxArray],
                             "key"	=> $key,
                     );
+		   $auxArray++;
                    
                     // try segundo método
                    try{
