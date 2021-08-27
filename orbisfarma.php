@@ -101,7 +101,7 @@ include 'settings.php';
                    // if ( isset( $result->Ticket->DescripcionExcepcion ) ){
                         //echo '<p>'.$result->Ticket->DescripcionExcepcion.'</p>';
                    // }
-                   /*
+                   
                    if( isset( $result->Ticket->Folio->TipoOperacion ) ){
                         //Guardamos los mensajes que devuelve el WS
                         $marzam_messages = [];

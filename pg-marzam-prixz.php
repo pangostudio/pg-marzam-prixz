@@ -42,21 +42,11 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             if ( $variation_id ) $_product = wc_get_product( $variation_id );
             else $_product = wc_get_product( $product_id);
             $ean = wpm_get_code_gtin_by_product($product_id);
-            //$segmentedEan = explode(" ", $ean);
-            //var_dump($product_id);
-            var_dump("-------------------");
-            //var_dump($ean);
-            var_dump("-------------------");
-            var_dump("-------------------");
+         
+            //Calcula los precios de los productos y los concatena para usarlos en la segunda llamada al webservice   
            $array_items[] = $items = $ean . ',' . $values['quantity'] .','. $_product->get_price($product_id) . ',' . ($values['quantity'] * $_product->get_price($product_id));
-
-            if (is_array($array_items))
-                foreach($array_items as $productos)
-                {
-                    
-                }
-                var_dump($productos);            
-                //Coge el atributo
+           $itemsConcatenado = implode("|", $array_items);
+            //Coge el atributo
             $isMarzam = $_product->get_attribute('pa_marzam');
             if ($isMarzam == 'marzam'){
                 // hide coupon field on cart page
@@ -99,11 +89,9 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                     $sxe = new SimpleXMLElement($parse_xml);
                     $sxe->registerXPathNamespace('d', 'urn:schemas-microsoft-com:xml-diffgram-v1');
                     $result = $sxe->xpath("//NewDataSet");
-                    echo "<pre>";
                     foreach ($result[0] as $title) {
-                        print_r($title);
+                        
                     }
-                    echo "</pre>";
 		   
 			   //tenemos el ean de cada producto
               
@@ -128,11 +116,9 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                             "posid"		=> '1',
                             "employeeid"	=> '100',
                             "transactionid" => $transactionid,
-                            "transactionitems" => $productos,
-			//"transactionitems" => $arrayWS[$auxArray],
+                            "transactionitems" => $itemsConcatenado,
                             "key"	=> $key,
                     );
-		  // $auxArray++;
                    
                     // try segundo método
                    try{
@@ -142,14 +128,14 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                    $sxe = new SimpleXMLElement($parse_xml);
                    $sxe->registerXPathNamespace('d', 'urn:schemas-microsoft-com:xml-diffgram-v1');
                    $result = $sxe->xpath("//NewDataSet");
-                   echo "<pre>";
-                   foreach ($result[0] as $title) {
-                    print_r($title);
-                   }
-                   echo "</pre>";
+                    foreach ($result[0] as $title) {
+                        
+                    }
 
                         //Sacar las variables del segundo método
                         $transactionitemsDiscount = $title->transactionitems;
+                        //var_dump("-------------------");var_dump("-------------------");
+                        //var_dump($transactionitemsDiscount);
                         $cart_data['transactionitemsDiscount'] = (array)$transactionitemsDiscount;
                         $transactiondate = $title->transactiondate; 
                         $transactionwithdrawal = 0; 
@@ -164,33 +150,39 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                     catch(Exception $e) {
                         echo 'no funciona';
                        }
-
-                            //Se setean los tipos de ofertas
-                       
-                        $transactionimtesDiscount_array = explode('|',$transactionitemsDiscount);
-                        foreach($transactionimtesDiscount_array as $transactionitemall) {
-                        $transactionitem = explode(',',$transactionitemall);
-                        $array_respuesta[$transactionitem[0]] = [
-                        "ean" => $transactionitem[0],
-                        "quantity" => $transactionitem[1],
-                        "discount" => $transactionitem[2],
-                        "free_pieces" => $transactionitem[3],
-                        "product_id"    => $product["product_id"],
-                        "variation_id"	=> $product["variation_id"],
-                        ];
-                        if($array_respuesta[$transactionitem[0]]['free_pieces'] > 0) {
-                        $array_respuesta[$transactionitem[0]]['type'] = 2;
-                        $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['free_pieces'] . " pieza gratis";
-                        }
-                        elseif($array_respuesta[$transactionitem[0]]['discount'] > 0) {
-                        $array_respuesta[$transactionitem[0]]['type'] = 1;
-                        $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['discount'] . "% de Descuento";
-                        $array_respuesta[$transactionitem[0]]['discount'] = $_product->get_price() * $array_respuesta[$ean]["discount"] / 100;
-                        }
-                        else {
-                        $array_respuesta[$transactionitem[0]]['type'] = 0;
-                        $array_respuesta[$transactionitem[0]]['message'] = "";
-                        }
+                        
+                       //Se setean los tipos de ofertas
+                    $transactionitemsDiscount_array = explode('|',$transactionitemsDiscount);
+                        foreach($transactionitemsDiscount_array as $transactionitemall) {
+                            $_product = wc_get_product( $product["product_id"]);
+                            $transactionitem = explode(',',$transactionitemall);
+                            $array_respuesta[$transactionitem[0]] = [
+                            "ean" => $transactionitem[0],
+                            "quantity" => $transactionitem[1],
+                            "discount" => $transactionitem[2],
+                            "free_pieces" => $transactionitem[3],
+                            "product_id"    => $product["product_id"],
+                            "variation_id"	=> $product["variation_id"],
+                            ];
+                                if($array_respuesta[$transactionitem[0]]['free_pieces'] > 0) {
+                                    $array_respuesta[$transactionitem[0]]['type'] = 2;
+                                    $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['free_pieces'] . " pieza gratis";
+                                }
+                                elseif($array_respuesta[$transactionitem[0]]['discount'] > 0) {
+                                    $array_respuesta[$transactionitem[0]]['type'] = 1;
+                                    $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['discount'] . "% de Descuento";
+                                    $array_respuesta[$transactionitem[0]]['discount'] = $_product->get_price() * $array_respuesta[$ean]["discount"] / 100;
+                                //var_dump("-------------------");
+                                //var_dump("-------------------");
+                                //var_dump($_product->get_price(), $ean);
+                                //var_dump("-------------------");
+                                //var_dump("-------------------");
+                                //var_dump($array_respuesta[$transactionitem[0]]['discount']);
+                                }
+                                else {
+                                $array_respuesta[$transactionitem[0]]['type'] = 0;
+                                $array_respuesta[$transactionitem[0]]['message'] = "";
+                                }
                        
                         }
                         $cart_data["benefits"][] = $array_respuesta;
@@ -239,6 +231,7 @@ function orbis_prixz_woocommerce_before_cart(){
 
     foreach ( $cart_data["benefits"] as $benefit ){
        foreach( $benefit as $information){
+           //var_dump($information);
         if ( $information["type"] == 1 && isset( $information["discount"] ) && $information["discount"] > 0 ){
             if ( isset( $information["variation_id"] ) && $information["variation_id"] ) $_product = wc_get_product( $information["variation_id"] );
             else $_product = wc_get_product( $information["product_id"] );
