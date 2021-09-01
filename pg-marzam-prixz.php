@@ -171,7 +171,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                                 elseif($array_respuesta[$transactionitem[0]]['discount'] > 0) {
                                     $array_respuesta[$transactionitem[0]]['type'] = 1;
                                     $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['discount'] . "% de Descuento";
-                                    $array_respuesta[$transactionitem[0]]['discount'] = $_product->get_price() * $array_respuesta[$ean]["discount"] / 100;
+                                    $array_respuesta[$transactionitem[0]]['discount'] = ($_product->get_price() * $array_respuesta[$transactionitem[0]]['quantity'])* $array_respuesta[$ean]["discount"] / 100;
                                 //var_dump("-------------------");
                                 //var_dump("-------------------");
                                 //var_dump($_product->get_price(), $ean);
