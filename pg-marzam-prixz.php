@@ -44,8 +44,9 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             $ean = wpm_get_code_gtin_by_product($product_id);
          
             //Calcula los precios de los productos y los concatena para usarlos en la segunda llamada al webservice   
-           $array_items[] = $items = $ean . ',' . $values['quantity'] .','. $_product->get_price($product_id) . ',' . ($values['quantity'] * $_product->get_price($product_id));
-           $itemsConcatenado = implode("|", $array_items);
+           $items[$product_id] = $ean . ',' . $values['quantity'] .','. $_product->get_price($product_id) . ',' . ($values['quantity'] * $_product->get_price($product_id));
+           //$itemsConcatenado = implode("|", $array_items);
+          
             //Coge el atributo
             $isMarzam = $_product->get_attribute('pa_marzam');
             if ($isMarzam == 'marzam'){
@@ -62,6 +63,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             }
         }
     }
+    //var_dump($items);
        // Get benefits
 		$cart_data["benefits"] = array();
 
@@ -116,10 +118,9 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                             "posid"		=> '1',
                             "employeeid"	=> '100',
                             "transactionid" => $transactionid,
-                            "transactionitems" => $itemsConcatenado,
+                            "transactionitems" => $items[$product["product_id"]],
                             "key"	=> $key,
                     );
-                   
                     // try segundo método
                    try{
                     $result = $client->setTransactionQuote( $args );
@@ -135,7 +136,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                         //Sacar las variables del segundo método
                         $transactionitemsDiscount = $title->transactionitems;
                         //var_dump("-------------------");var_dump("-------------------");
-                        //var_dump($transactionitemsDiscount);
+                        var_dump($transactionitemsDiscount);
                         $cart_data['transactionitemsDiscount'] = (array)$transactionitemsDiscount;
                         $transactiondate = $title->transactiondate; 
                         $transactionwithdrawal = 0; 
@@ -152,10 +153,13 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                        }
                         
                        //Se setean los tipos de ofertas
-                    $transactionitemsDiscount_array = explode('|',$transactionitemsDiscount);
-                        foreach($transactionitemsDiscount_array as $transactionitemall) {
+                       
+                       //$transactionitemsDiscount_array = explode('|',$transactionitemsDiscount);
+                    //var_dump($transactionitemsDiscount);
+                       // foreach($transactionitemsDiscount_array as $transactionitemall) {
+                            //var_dump($transactionitemall);
                             $_product = wc_get_product( $product["product_id"]);
-                            $transactionitem = explode(',',$transactionitemall);
+                            $transactionitem = explode(',',$transactionitemsDiscount);
                             $array_respuesta[$transactionitem[0]] = [
                             "ean" => $transactionitem[0],
                             "quantity" => $transactionitem[1],
@@ -164,6 +168,7 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                             "product_id"    => $product["product_id"],
                             "variation_id"	=> $product["variation_id"],
                             ];
+                           // var_dump($array_respuesta);
                                 if($array_respuesta[$transactionitem[0]]['free_pieces'] > 0) {
                                     $array_respuesta[$transactionitem[0]]['type'] = 2;
                                     $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['free_pieces'] . " pieza gratis";
@@ -171,25 +176,27 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
                                 elseif($array_respuesta[$transactionitem[0]]['discount'] > 0) {
                                     $array_respuesta[$transactionitem[0]]['type'] = 1;
                                     $array_respuesta[$transactionitem[0]]['message'] = $array_respuesta[$transactionitem[0]]['discount'] . "% de Descuento";
-                                    $array_respuesta[$transactionitem[0]]['discount'] = ($_product->get_price() * $array_respuesta[$transactionitem[0]]['quantity'])* $array_respuesta[$ean]["discount"] / 100;
+                                    $array_respuesta[$transactionitem[0]]['discount'] = ($_product->get_price() * $array_respuesta[$transactionitem[0]]['quantity'])* $array_respuesta[$transactionitem[0]]['discount'] / 100;
                                 //var_dump("-------------------");
                                 //var_dump("-------------------");
                                 //var_dump($_product->get_price(), $ean);
                                 //var_dump("-------------------");
                                 //var_dump("-------------------");
-                                //var_dump($array_respuesta[$transactionitem[0]]['discount']);
+                                //var_dump($array_respuesta[$transactionitem[0]]['message']);
                                 }
                                 else {
                                 $array_respuesta[$transactionitem[0]]['type'] = 0;
                                 $array_respuesta[$transactionitem[0]]['message'] = "";
                                 }
                        
-                        }
+                        //}
                         $cart_data["benefits"][] = $array_respuesta;
-    
+                                
            }
+           
            // Set benefits and apply them
            foreach ( $cart->get_cart() as $item => $values ) {
+               //var_dump($values);
                $product_id = $values['product_id'];
                $variation_id = $values['variation_id'];
                if ( $variation_id ) $_product = wc_get_product( $variation_id );
@@ -197,15 +204,15 @@ function orbis_prixz_woocommerce_before_calculate_totals( $cart ) {
             
                $sku = wpm_get_code_gtin_by_product($product_id);
                
-               $benefit_type = isset( $array_respuesta[$ean]["type"] ) ? $array_respuesta[$ean]["type"] : '';
+               $benefit_type = isset( $array_respuesta[$sku]["type"] ) ? $array_respuesta[$sku]["type"] : '';
                switch( $benefit_type  ){
                    case "2":
-                           $item_name = $_product->get_name().' ('.__( 'Producto gratis','orbis-prixz' ).')'.'<br><span class="message">'.$array_respuesta[$ean]["message"].'</span>';
+                           $item_name = $_product->get_name().' ('.__( 'Producto gratis','orbis-prixz' ).')'.'<br><span class="message">'.$array_respuesta[$sku]["message"].'</span>';
                            $values["data"]->set_name( $item_name );
                            $values["data"]->set_price( 0 );
                        break;
                    case "1":
-                           $item_name = $_product->get_name().'<br><span class="message">'.$array_respuesta[$ean]["message"].'</span>';
+                           $item_name = $_product->get_name().'<br><span class="message">'.$array_respuesta[$sku]["message"].'</span>';
                            $values["data"]->set_name( $item_name );
                            
                        break;
